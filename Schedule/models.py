@@ -65,10 +65,10 @@ class UserScheduledTimetable(models.Model):
 class Venue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=150, unique=True)
-    capacity = models.IntegerField()
+    capacity = models.IntegerField(null=True)
 
     def __str__(self):
-        return self.name, self.capacity
+        return "{}---{}".format(self.name, self.capacity)
 
 
 class ExamTimetable(BaseModel):
@@ -88,6 +88,6 @@ class Event(BaseModel):
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150, null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

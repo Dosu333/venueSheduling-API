@@ -46,7 +46,7 @@ class VenueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Venue
-        fields = ('name', 'id')
+        fields = ('name', 'id','capacity')
         read_only_fields = ['id', ]
 
 class ExamTimetableSerializer(BaseSerializer):

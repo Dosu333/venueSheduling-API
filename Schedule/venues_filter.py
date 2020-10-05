@@ -89,19 +89,23 @@ def get_available_venues(start,end,date=None,day=None, purpose=None):
         try:
             if items.start_time != start:
                 show_venues.append(items)
+            elif items.start_time == start:
+                ven_no.append(items)
         except AttributeError:
             if items.start_date_and_time.time() != start:
                 show_venues.append(items)
+            elif items.start_date_and_time.time() == start:
+                ven_no.append(items)
 
 
     for item in show_venues:
         """Checks for objects whose times intersect with received times and puts them in a list of objects not to show"""
         try:
-            if is_between(start, (items.start_time, items.end_time)) or is_between(items.start_time,(start,end)):
-                ven_no.append(items)
+            if is_between(start, (item.start_time, item.end_time)) or is_between(item.start_time,(start,end)):
+                ven_no.append(item)
         except AttributeError:
-            if is_between(start, (items.start_date_and_time.time(), items.end_time)) or is_between(items.start_date_and_time.time(),(start,end)):
-                ven_no.append(items)
+            if is_between(start, (item.start_date_and_time.time(), item.end_time)) or is_between(item.start_date_and_time.time(),(start,end)):
+                ven_no.append(item)
 
     for obj in show_venues:
         """Compares the list of venues to show with the list of venues not to show and puts objects with the same venue in a list"""
