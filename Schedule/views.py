@@ -26,7 +26,6 @@ class SchoolTimetableViewSet(BaseAdminViewSet):
 
 class UserScheduleViewset(viewsets.ModelViewSet):
     queryset = models.UserScheduledTimetable.objects.all()
-    serializer_class = serializers.UserScheduledTimetableSerializer
     authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (IsLecturer, )
 
@@ -35,6 +34,11 @@ class UserScheduleViewset(viewsets.ModelViewSet):
 
     def perform_create(self,serializer):
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.UserScheduledDetailSerializer
+        return serializers.UserScheduledTimetableSerializer
        
 
 class ListAvailableVenuesView(views.APIView):

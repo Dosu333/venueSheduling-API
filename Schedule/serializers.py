@@ -10,7 +10,6 @@ def check_time_within_working_hours(start,end):
     return (start >= time(7,00) and start <= time(18,30)) and (end >= time(8,00) and end <= time(19,00))
 
 
-
 class BaseSerializer(serializers.ModelSerializer):
 
 
@@ -96,7 +95,7 @@ class UserScheduledTimetableSerializer(BaseSerializer):
 
 
         avail_ven = get_available_venues(start=start,end=end,date=date)
-        if venue.name not in avail_ven:
+        if str(venue.id) not in avail_ven:
             raise serializers.ValidationError("Venue no longer available")
         
         return attrs
@@ -128,7 +127,7 @@ class QueryParamsSerializer(BaseSerializer):
 
     class Meta:
         model = models.UserScheduledTimetable
-        fields = ('purpose','start_date_and_time','end_time')
+        fields = ('start_date_and_time','end_time')
 
 class NotificationSerializer(serializers.ModelSerializer):
 
@@ -136,3 +135,12 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = models.Notification
         fields = '__all__'
         read_only_fields = ['id','created_at']
+
+class UserScheduledDetailSerializer(serializers.ModelSerializer):
+    course = serializers.StringRelatedField()
+    venue = serializers.StringRelatedField()
+    
+    class Meta:
+        model  = models.UserScheduledTimetable
+        fields = ('__all__')
+        read_only_fields = ['__all__']

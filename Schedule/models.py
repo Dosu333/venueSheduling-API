@@ -51,10 +51,10 @@ class UserScheduledTimetable(models.Model):
     start_date_and_time = models.DateTimeField()
     end_time = models.TimeField()
     PURPOSE_CHOICES = [
-        ('LT','Lecture'),
-        ('DF','Defence'),
-        ('MT','Meeting'),
-        ('TS','Test'),
+        ('Lecture','Lecture'),
+        ('Defence','Defence'),
+        ('Meeting','Meeting'),
+        ('Test','Test'),
     ]
     purpose = models.CharField(max_length=7, choices=PURPOSE_CHOICES)
 
