@@ -68,7 +68,10 @@ class Venue(models.Model):
     capacity = models.IntegerField(null=True)
 
     def __str__(self):
-        return "{}---{}".format(self.name, self.capacity)
+        return self.name
+
+    def natural_key(self):
+        return (self.name, self.capacity)
 
 
 class ExamTimetable(BaseModel):

@@ -16,7 +16,7 @@ def getDayOfWeek(ojo):
         format_date = dt.fromisoformat(str_date)
         return str(format_date.weekday())
 
-def get_available_venues(start,end,date=None,day=None, purpose=None):
+def get_available_venues(start,end,date=None,day=None):
     venue_on_day = []
     venue_not_on_day = []
     show_venues = []
@@ -24,7 +24,7 @@ def get_available_venues(start,end,date=None,day=None, purpose=None):
     displace = []
     unique =[]
     events = []
-    final = []
+    keys ={}
 
     if date is not None:
         qday = getDayOfWeek(date)
@@ -151,24 +151,17 @@ def get_available_venues(start,end,date=None,day=None, purpose=None):
             show_venues.remove(item)
             
     for item in show_venues:
-        final.append(str(item.venue))
+        if item.venue.id in keys:
+            continue
+        keys[str(item.venue.id)] = item.venue.name
 
-    return set(final)
+    return keys
 
 
-def re_check_venues(owned,venue):
-    for item in owned:
-        if venue == item.venue:
-            msg = """
-                  Your scheduling of a venue for a {} at {} on {} has been cancelled 
-                  because the venue is being used for events of higher priorties.
-                  Please try rescheduling for another venue. 
-                  We are sorry for any inconviniences. 
-                  """
-            note = models.Notification(user=item.user, text=msg.format(item.purpose, item.venue, item.start_date_and_time.date()))
-            note.save()
-            item_to_delete = models.UserScheduledTimetable.objects.get(pk=item.id)
-            item_to_delete.delete()
-            break
+def re_check_venues(start,end,venue,date):
+    avail_ven = get_available_venues(start,end,date)
+    if venue in avail_ven:
+        return True
+    return False
     
         

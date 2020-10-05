@@ -48,9 +48,8 @@ class ListAvailableVenuesView(views.APIView):
             date = serialized.data['start_date_and_time'].date()
             start = serialized.data['start_date_and_time'].time()
             end = serialized.data['end_time']
-            purpose = serialized.data['purpose']
 
-            venues = get_available_venues(date=date, start=start, end=end, purpose=purpose)
+            venues = get_available_venues(date=date, start=start, end=end)
 
             return Response({'available-venues':venues})      
 
