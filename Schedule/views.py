@@ -12,17 +12,48 @@ class BaseAdminViewSet(viewsets.ModelViewSet):
     authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
 
-class CourseViewSet(BaseAdminViewSet):
+    def perform_create(self,serializer):
+        instance = serializer.save()
+        date = serializer.initial_data['start_date_and_time']
+        time = serializer.initial_data['end_time']
+        obj = self.queryset.get(pk=instance.id)
+        
+        models.SummaryTimetable.objects.create(start_date_and_time=date, end_time=time, content_object=obj)
+
+class CourseViewSet(viewsets.ModelViewSet):
     queryset = models.Course.objects.all()
     serializer_class = serializers.CourseSerializer
+    authentication_classes = (authentication.TokenAuthentication, )
+    permission_classes = (permissions.IsAdminUser, )
     
-class VenueViewSet(BaseAdminViewSet):
+class VenueViewSet(viewsets.ModelViewSet):
     queryset = models.Venue.objects.all()
     serializer_class = serializers.VenueSerializer
+    authentication_classes = (authentication.TokenAuthentication, )
+    permission_classes = (permissions.IsAdminUser, )
 
-class SchoolTimetableViewSet(BaseAdminViewSet):
+class ExamTimetableViewSet(BaseAdminViewSet):
+    queryset = models.ExamTimetable.objects.all()
+    serializer_class = serializers.ExamTimetableSerializer
+
+class EventViewSet(BaseAdminViewSet):
+    queryset = models.Event.objects.all()
+    serializer_class = serializers.EventSerializer
+
+class SchoolTimetableViewSet(viewsets.ModelViewSet):
     queryset = models.SchoolTimetable.objects.all()
     serializer_class = serializers.SchoolTimetableSerializer
+    authentication_classes = (authentication.TokenAuthentication, )
+    permission_classes = (permissions.IsAdminUser, )
+
+    def perform_create(self,serializer):
+        instance = serializer.save()
+        start_time = serializer.initial_data['start_time']
+        end_time = serializer.initial_data['end_time']
+        day = serializer.initial_data['day']
+        obj = self.queryset.get(pk=instance.id)
+        
+        models.SummaryTimetable.objects.create(start_time=start_time, end_time=end_time, day=day, content_object=obj)
 
 class UserScheduleViewset(viewsets.ModelViewSet):
     queryset = models.UserScheduledTimetable.objects.all()
@@ -33,7 +64,13 @@ class UserScheduleViewset(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user).order_by('-start_date_and_time')    
 
     def perform_create(self,serializer):
-        serializer.save(user=self.request.user)
+        instance = serializer.save(user=self.request.user)
+        date = serializer.initial_data['start_date_and_time']
+        time = serializer.initial_data['end_time']
+        obj = models.UserScheduledTimetable.objects.get(pk=instance.id)
+        
+        models.SummaryTimetable.objects.create(start_date_and_time=date, end_time=time, content_object=obj)
+        
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -55,7 +92,9 @@ class ListAvailableVenuesView(views.APIView):
 
             venues = get_available_venues(date=date, start=start, end=end)
 
-            return Response({'available-venues':venues})      
+            if venues:
+                return Response({'available-venues':venues})
+            return Response({'error':"No available venues"})      
 
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 

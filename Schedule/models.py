@@ -99,7 +99,6 @@ class Notification(models.Model):
 
 class SummaryTimetable(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=150)
     DAY_CHOICES = [
         ('0', 'Monday'),
         ('1', 'Tuesday'),
