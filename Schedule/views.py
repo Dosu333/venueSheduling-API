@@ -27,7 +27,7 @@ class SchoolTimetableViewSet(BaseAdminViewSet):
 class UserScheduleViewset(viewsets.ModelViewSet):
     queryset = models.UserScheduledTimetable.objects.all()
     authentication_classes = (authentication.TokenAuthentication, )
-    permission_classes = (IsLecturer, )
+    permission_classes = (permissions.IsAuthenticated, IsLecturer, )
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user).order_by('-start_date_and_time')    

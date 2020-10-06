@@ -8,7 +8,7 @@ import uuid
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    venue = models.ForeignKey('Venue', on_delete=models.SET_NULL, null=True, blank=True)
+    venue = models.ForeignKey('Venue', on_delete=models.SET_NULL, null=True,)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     end_time = models.TimeField()
 
@@ -18,13 +18,13 @@ class Course(models.Model):
     code = models.CharField(max_length=6, unique=True)
     title = models.CharField(max_length=150)
     description = models.TextField()
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
      return self.code
 
 class SchoolTimetable(BaseModel): 
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
     DAY_CHOICES = [
         ('0', 'Monday'),
         ('1', 'Tuesday'),
@@ -44,10 +44,10 @@ class SchoolTimetable(BaseModel):
     
 class UserScheduledTimetable(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=150, null=True, blank=True)
-    venue = models.ForeignKey('Venue', on_delete=models.CASCADE, null=True, blank=True)
+    venue = models.ForeignKey('Venue', on_delete=models.CASCADE, null=True)
     start_date_and_time = models.DateTimeField()
     end_time = models.TimeField()
     PURPOSE_CHOICES = [
@@ -75,7 +75,7 @@ class Venue(models.Model):
 
 
 class ExamTimetable(BaseModel):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
     start_date_and_time = models.DateTimeField()
 
     def __str__(self):
@@ -90,7 +90,7 @@ class Event(BaseModel):
 
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=150, null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
