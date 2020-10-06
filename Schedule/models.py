@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 from accounts.models import Department
 
@@ -94,3 +96,22 @@ class Notification(models.Model):
     title = models.CharField(max_length=150, null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+class SummaryTimetable(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=150)
+    DAY_CHOICES = [
+        ('0', 'Monday'),
+        ('1', 'Tuesday'),
+        ('2', 'Wednesday'),
+        ('3', 'Thursday'),
+        ('4', 'Friday'),
+        ('5','Saturday')
+    ]
+    day = models.CharField(max_length=10, choices=DAY_CHOICES, null=True,blank=True)
+    start_date_and_time = models.DateTimeField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time =  models.TimeField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey()
