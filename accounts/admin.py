@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
         (_('Personal Info'),{'fields':('first_name','last_name','department',)}),
         (
             _('Permissions'),
-            {'fields':('is_active', 'is_staff', 'is_lecturer','is_superuser')}
+            {'fields':('is_active', 'is_staff', 'role','is_superuser')}
         ),
         (_('Important dates'), {'fields':('last_login', )})
 
