@@ -58,4 +58,5 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ('name', )
+        fields = ('__all__')
+        read_only_fields = ['id',]

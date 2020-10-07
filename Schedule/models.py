@@ -111,6 +111,7 @@ class SummaryTimetable(models.Model):
     start_date_and_time = models.DateTimeField(null=True, blank=True)
     start_time = models.TimeField(null=True, blank=True)
     end_time =  models.TimeField()
+    venue = models.UUIDField()
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.UUIDField()
     content_object = GenericForeignKey()

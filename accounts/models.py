@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
         return user
 
 class Department(models.Model):
-    name = models.CharField(max_length=255, null=True)
+    name = models.CharField(max_length=255, null=True, unique=True)
 
     def __str__(self):
         return self.name

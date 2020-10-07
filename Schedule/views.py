@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .import serializers
 from .import models
 from.permissions import IsLecturer
-from.venues_filter import get_available_venues, re_check_venues
+from.venues_filter import get_available_venues
 # Create your views here.
 
 class BaseAdminViewSet(viewsets.ModelViewSet):
@@ -16,9 +16,10 @@ class BaseAdminViewSet(viewsets.ModelViewSet):
         instance = serializer.save()
         date = serializer.initial_data['start_date_and_time']
         time = serializer.initial_data['end_time']
+        venue = serializer.initial_data['venue']
         obj = self.queryset.get(pk=instance.id)
         
-        models.SummaryTimetable.objects.create(start_date_and_time=date, end_time=time, content_object=obj)
+        models.SummaryTimetable.objects.create(start_date_and_time=date, end_time=time, content_object=obj, venue=venue)
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = models.Course.objects.all()
@@ -51,9 +52,10 @@ class SchoolTimetableViewSet(viewsets.ModelViewSet):
         start_time = serializer.initial_data['start_time']
         end_time = serializer.initial_data['end_time']
         day = serializer.initial_data['day']
+        venue = serializer.initial_data['venue']
         obj = self.queryset.get(pk=instance.id)
         
-        models.SummaryTimetable.objects.create(start_time=start_time, end_time=end_time, day=day, content_object=obj)
+        models.SummaryTimetable.objects.create(start_time=start_time, end_time=end_time, day=day, content_object=obj, venue=venue )
 
 class UserScheduleViewset(viewsets.ModelViewSet):
     queryset = models.UserScheduledTimetable.objects.all()
@@ -67,9 +69,11 @@ class UserScheduleViewset(viewsets.ModelViewSet):
         instance = serializer.save(user=self.request.user)
         date = serializer.initial_data['start_date_and_time']
         time = serializer.initial_data['end_time']
-        obj = models.UserScheduledTimetable.objects.get(pk=instance.id)
+        venue = serializer.initial_data['venue'] 
         
-        models.SummaryTimetable.objects.create(start_date_and_time=date, end_time=time, content_object=obj)
+        obj = self.queryset.get(pk=instance.id)
+        
+        models.SummaryTimetable.objects.create(start_date_and_time=date, end_time=time, content_object=obj, venue=venue)
         
 
     def get_serializer_class(self):
@@ -90,7 +94,7 @@ class ListAvailableVenuesView(views.APIView):
             start = serialized.data['start_date_and_time'].time()
             end = serialized.data['end_time']
 
-            venues = get_available_venues(date=date, start=start, end=end)
+            venues = get_available_venues(date_day=date, start=start, end=end)
 
             if venues:
                 return Response({'available-venues':venues})

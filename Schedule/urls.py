@@ -11,6 +11,8 @@ router.register('courses', views.CourseViewSet)
 router.register('venues', views.VenueViewSet)
 router.register('timetable', views.SchoolTimetableViewSet)
 router.register('allocated-venues', views.UserScheduleViewset)
+router.register('exams', views.ExamTimetableViewSet)
+router.register('events', views.EventViewSet)
 
 urlpatterns = [
     path('available-venues/', views.ListAvailableVenuesView.as_view()),

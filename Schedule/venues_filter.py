@@ -2,101 +2,36 @@ from datetime import timedelta, time, datetime
 from datetime import date as dt
 from pytz import UTC as u
 
+from .helper_functions import is_between, getDayOfWeek, events
+
 
 from .import models
 
-def is_between(time, time_range):
-    if time_range[1] < time_range[0]:
-        return time > time_range[0] or time < time_range[1]
-    return time_range[0] < time < time_range[1]
-
-def getDayOfWeek(ojo):
-    if ojo != None:
-        str_date = str(ojo)
-        format_date = dt.fromisoformat(str_date)
-        return str(format_date.weekday())
-
-def get_available_venues(start,end,date=None,day=None):
-    venue_on_day = []
+def get_available_venues(start,end,date_day):
     venue_not_on_day = []
     show_venues = []
     ven_no = []
     displace = []
     unique =[]
-    events = []
     keys ={}
 
-    if date is not None:
-        qday = getDayOfWeek(date)
-
-        for item in models.SchoolTimetable.objects.all():
-            """Adds school timetables on the same day as date received and those not to respective list""" 
-
-            if item.day == qday:
-                venue_on_day.append(item)
-            else:
-                venue_not_on_day.append(item)
-
-        for item in models.UserScheduledTimetable.objects.all():
-            """Adds user scheduled timetables on the same date as date received and those not respective list""" 
-            if item.start_date_and_time.date() == date:
-                venue_on_day.append(item)
-            else:
-                venue_not_on_day.append(item)
-
-        for item in models.ExamTimetable.objects.all():
-            """Adds exam timetables on the same as date received and those not to respective list""" 
-            if item.start_date_and_time.date() == date:
-                venue_on_day.append(item)
-            else:
-                venue_not_on_day.append(item)
-        
-        for item in models.Event.objects.all():
-            """Adds events on the same date as date received to events list""" 
-            if item.start_date_and_time.date() == date:
-                events.append(item)
-            
-        
-    if day is not None:
-        for item in models.SchoolTimetable.objects.all():
-            """Adds school timetables on the same day as date received and those not to respective list""" 
-            if item.day == day:
-                venue_on_day.append(item)
-            else:
-                venue_not_on_day.append(item)
-
-        for item in models.UserScheduledTimetable.objects.all():
-            """Adds user scheduled timetables on the same day as day received and those not respective list""" 
-            if getDayOfWeek(item.start_date_and_time.date()) == day:
-                venue_on_day.append(item)
-            else:
-                venue_not_on_day.append(item)
-
-        for item in models.ExamTimetable.objects.all():
-            """Adds exam timetables on the same day as day received and those not to respective list"""
-            if getDayOfWeek(item.start_date_and_time.date()) == day:
-                venue_on_day.append(item)
-            else:
-                venue_not_on_day.append(item)
-
-        for item in models.Event.objects.all():
-            """Adds events on the same day as day received to events list""" 
-            if getDayOfWeek(item.start_date_and_time.date()) == day:
-                events.append(item)
-    
-    for items in venue_on_day:
+    for items in models.SummaryTimetable.objects.all():
         """Puts objects that doesn't have the same starting time as received starting in a list of objects to show """ 
         try:
-            if items.start_time != start:
+            qday = getDayOfWeek(date_day)
+            if items.start_time != start and items.day == qday:
                 show_venues.append(items)
+            elif items.day != qday:
+                venue_not_on_day.append(items)
             elif items.start_time == start:
                 ven_no.append(items)
         except AttributeError:
-            if items.start_date_and_time.time() != start:
+            if items.start_date_and_time.time() != start and getDayOfWeek(items.start_date_and_time.date()) == date_day:
                 show_venues.append(items)
+            elif getDayOfWeek(items.start_date_and_time.date()) != date_day:
+                venue_not_on_day.append(items)
             elif items.start_date_and_time.time() == start:
                 ven_no.append(items)
-
 
     for item in show_venues:
         """Checks for objects whose times intersect with received times and puts them in a list of objects not to show"""
@@ -113,9 +48,11 @@ def get_available_venues(start,end,date=None,day=None):
             if obj.venue == ven.venue:
                 displace.append(obj)
 
+    d = show_venues + ven_no
+
     for obj in venue_not_on_day:
         """Gets venues that have no instance on the day or date received"""
-        for ven in venue_on_day:
+        for ven in d:
             if obj.venue == ven.venue:
                 unique.append(obj)
 
@@ -133,7 +70,7 @@ def get_available_venues(start,end,date=None,day=None):
 
     unique.clear()
     
-    for item in events:
+    for item in events(date_day):
         """Checks if 2hrs after an event has ended the starting time received will not have begun"""
         end_time = (datetime.combine(dt(1,1,1), item.end_time) + timedelta(hours=2)).time()
         if start < end_time or end_time >= time(7,00):
@@ -142,7 +79,7 @@ def get_available_venues(start,end,date=None,day=None):
     for item in show_venues:
         """Compares the list of venues with events with the list of venues show and puts objects with the same venue in a list"""
         for obj in displace:
-            if item.venue == obj.venue:
+            if item.venue == obj.venue.id:
                 unique.append(item)
 
     for item in unique:
@@ -151,17 +88,9 @@ def get_available_venues(start,end,date=None,day=None):
             show_venues.remove(item)
             
     for item in show_venues:
-        if item.venue.id in keys:
+        if str(item.venue) in keys:
             continue
-        keys[str(item.venue.id)] = item.venue.name
+        available = models.Venue.objects.get(pk=item.venue)
+        keys[str(item.venue)] = (available.name, available.capacity) 
 
     return keys
-
-
-def re_check_venues(start,end,venue,date):
-    avail_ven = get_available_venues(start,end,date)
-    if venue in avail_ven:
-        return True
-    return False
-    
-        

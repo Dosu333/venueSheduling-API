@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from . import models
-from .venues_filter import get_available_venues, re_check_venues
+from .venues_filter import get_available_venues
 
 from datetime import datetime, time, date
 from pytz import UTC as utc
@@ -38,14 +38,14 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Course
-        fields = ('id','code','title','description','department','users')
+        fields = ('__all__')
         read_only_fields = ['id','users' ]
 
 class VenueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Venue
-        fields = ('name', 'id','capacity')
+        fields = ('__all__')
         read_only_fields = ['id', ]
 
 class ExamTimetableSerializer(BaseSerializer):
@@ -60,16 +60,16 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Event
-        fields = ('id','name','venue','users','start_date_and_time','end_time')
+        fields = ('__all__')
         read_only_fields = ['id', 'users']
 
-class UserScheduledTimetableSerializer(BaseSerializer):
+class UserScheduledTimetableSerializer(serializers.ModelSerializer):
     start_date_and_time = serializers.DateTimeField(format=None)
     end_time = serializers.TimeField(format=None)
     
     class Meta:
         model = models.UserScheduledTimetable
-        fields = ('id','user','course','name','venue','purpose','start_date_and_time','end_time')
+        fields = ('__all__')
         read_only_fields = ['id', 'user']
 
     def validate(self, attrs):
@@ -94,7 +94,7 @@ class UserScheduledTimetableSerializer(BaseSerializer):
             raise serializers.ValidationError("Time must be within working hours")
 
 
-        avail_ven = get_available_venues(start=start,end=end,date=date)
+        avail_ven = get_available_venues(start=start,end=end,date_day=date)
         if str(venue.id) not in avail_ven:
             raise serializers.ValidationError("Venue no longer available")
         
@@ -133,7 +133,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Notification
-        fields = '__all__'
+        fields = ('__all__')
         read_only_fields = ['id','created_at']
 
 class UserScheduledDetailSerializer(serializers.ModelSerializer):
