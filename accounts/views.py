@@ -35,7 +35,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
 
-class RoleView(generics.ListCreateAPIView):
+class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     authentication_classes = (authentication.TokenAuthentication, )
