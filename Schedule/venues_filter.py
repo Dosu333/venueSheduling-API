@@ -4,7 +4,6 @@ from pytz import UTC as u
 
 from .helper_functions import is_between, getDayOfWeek, events
 
-
 from .import models
 
 def get_available_venues(start,end,date_day):

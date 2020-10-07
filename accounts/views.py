@@ -5,8 +5,9 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .serializers import UserSerializer, AuthTokenSerializer, DepartmentSerializer
-from .models import Department
+
+from .serializers import UserSerializer, AuthTokenSerializer, DepartmentSerializer, RoleSerializer
+from .models import Department, Role
 # Create your views here.
 
 class CreateUserView(generics.CreateAPIView):
@@ -33,3 +34,9 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     serializer_class = DepartmentSerializer
     authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
+
+class RoleView(generics.ListCreateAPIView):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+    authentication_classes = (authentication.TokenAuthentication, )
+    permission_classes = (permissions.IsAdminUser,)

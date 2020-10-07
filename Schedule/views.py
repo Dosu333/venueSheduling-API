@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from .import serializers
 from .import models
-from.permissions import IsLecturer
+from.permissions import IsNotStudent
 from.venues_filter import get_available_venues
 # Create your views here.
 
@@ -60,7 +60,7 @@ class SchoolTimetableViewSet(viewsets.ModelViewSet):
 class UserScheduleViewset(viewsets.ModelViewSet):
     queryset = models.UserScheduledTimetable.objects.all()
     authentication_classes = (authentication.TokenAuthentication, )
-    permission_classes = (permissions.IsAuthenticated, IsLecturer, )
+    permission_classes = (permissions.IsAuthenticated, IsNotStudent, )
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user).order_by('-start_date_and_time')    
