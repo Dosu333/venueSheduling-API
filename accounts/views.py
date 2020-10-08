@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 
-from .serializers import UserSerializer, AuthTokenSerializer, DepartmentSerializer, RoleSerializer
+from .serializers import UserSerializer, DepartmentSerializer, RoleSerializer
 from .models import Department, Role
 # Create your views here.
 
