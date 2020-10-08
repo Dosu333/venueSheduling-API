@@ -1,4 +1,4 @@
-from rest_framework import viewsets, authentication, permissions, status, views, generics
+from rest_framework import viewsets,permissions, status, views, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -9,7 +9,6 @@ from.venues_filter import get_available_venues
 # Create your views here.
 
 class BaseAdminViewSet(viewsets.ModelViewSet):
-    authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
 
     def perform_create(self,serializer):
@@ -24,13 +23,11 @@ class BaseAdminViewSet(viewsets.ModelViewSet):
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = models.Course.objects.all()
     serializer_class = serializers.CourseSerializer
-    authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
     
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = models.Venue.objects.all()
     serializer_class = serializers.VenueSerializer
-    authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
 
 class ExamTimetableViewSet(BaseAdminViewSet):
@@ -44,7 +41,6 @@ class EventViewSet(BaseAdminViewSet):
 class SchoolTimetableViewSet(viewsets.ModelViewSet):
     queryset = models.SchoolTimetable.objects.all()
     serializer_class = serializers.SchoolTimetableSerializer
-    authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAdminUser, )
 
     def perform_create(self,serializer):
@@ -59,7 +55,6 @@ class SchoolTimetableViewSet(viewsets.ModelViewSet):
 
 class UserScheduleViewset(viewsets.ModelViewSet):
     queryset = models.UserScheduledTimetable.objects.all()
-    authentication_classes = (authentication.TokenAuthentication, )
     permission_classes = (permissions.IsAuthenticated, IsNotStudent, )
 
     def get_queryset(self):
@@ -83,7 +78,6 @@ class UserScheduleViewset(viewsets.ModelViewSet):
        
 
 class ListAvailableVenuesView(views.APIView):
-    authentication_classes = [authentication.TokenAuthentication, ]
     permission_classes = [permissions.IsAuthenticated, ]
     serializer_class = serializers.QueryParamsSerializer
     
@@ -105,7 +99,6 @@ class ListAvailableVenuesView(views.APIView):
 class NotificationView(generics.ListAPIView):
     queryset = models.Notification.objects.all()
     serializer_class = serializers.NotificationSerializer
-    authentication_classes = [authentication.TokenAuthentication, ]
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get_queryset(self):
