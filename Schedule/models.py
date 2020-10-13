@@ -7,6 +7,24 @@ from accounts.models import Department
 
 import uuid
 # Create your models here.
+class SummaryTimetable(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    DAY_CHOICES = [
+        ('0', 'Monday'),
+        ('1', 'Tuesday'),
+        ('2', 'Wednesday'),
+        ('3', 'Thursday'),
+        ('4', 'Friday'),
+        ('5','Saturday')
+    ]
+    day = models.CharField(max_length=10, choices=DAY_CHOICES, null=True,blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time =  models.TimeField()
+    venue = models.UUIDField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey()
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -40,10 +58,7 @@ class SchoolTimetable(BaseModel):
 
     def __str__(self):
         return self.course.code
-
-    
-    
-    
+   
 class UserScheduledTimetable(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
@@ -59,10 +74,9 @@ class UserScheduledTimetable(models.Model):
         ('Test','Test'),
     ]
     purpose = models.CharField(max_length=7, choices=PURPOSE_CHOICES)
-
+    
     def __str__(self):
         return self.venue.name
-
 
 class Venue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -74,7 +88,6 @@ class Venue(models.Model):
 
     def natural_key(self):
         return (self.name, self.capacity)
-
 
 class ExamTimetable(BaseModel):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
@@ -96,22 +109,3 @@ class Notification(models.Model):
     title = models.CharField(max_length=150, null=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-
-class SummaryTimetable(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    DAY_CHOICES = [
-        ('0', 'Monday'),
-        ('1', 'Tuesday'),
-        ('2', 'Wednesday'),
-        ('3', 'Thursday'),
-        ('4', 'Friday'),
-        ('5','Saturday')
-    ]
-    day = models.CharField(max_length=10, choices=DAY_CHOICES, null=True,blank=True)
-    start_date_and_time = models.DateTimeField(null=True, blank=True)
-    start_time = models.TimeField(null=True, blank=True)
-    end_time =  models.TimeField()
-    venue = models.UUIDField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.UUIDField()
-    content_object = GenericForeignKey()

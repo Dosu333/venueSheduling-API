@@ -18,7 +18,7 @@ class BaseSerializer(serializers.ModelSerializer):
         end_time = attrs.get('end_time')
         today_date = utc.localize(datetime.now())
 
-        if today_date > start_date_and_time.replace(tzinfo=utc):
+        if today_date >= start_date_and_time.replace(tzinfo=utc):
             msg = "Enter a future date and time"
             raise serializers.ValidationError(msg)
 
@@ -41,6 +41,11 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ('__all__')
         read_only_fields = ['id','users' ]
 
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        representation['department'] = models.Department.objects.get(id=str(representation['department'])).name
+        return representation
+
 class VenueSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -49,11 +54,21 @@ class VenueSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', ]
 
 class ExamTimetableSerializer(BaseSerializer):
+    start_date_and_time = serializers.DateTimeField(format=None)
+    end_time = serializers.TimeField(format=None)
 
     class Meta:
         model = models.ExamTimetable
         fields = ('id','course','venue','users','start_date_and_time','end_time')
         read_only_fields = ['id', 'users']
+
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        value1 = representation['course']
+        value2 = representation['venue']
+        representation['venue'] = models.Venue.objects.get(pk=value2).name
+        representation['course'] = models.Course.objects.get(pk=value1).code
+        return representation
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -62,6 +77,12 @@ class EventSerializer(serializers.ModelSerializer):
         model = models.Event
         fields = ('__all__')
         read_only_fields = ['id', 'users']
+
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        value2 = representation['venue']
+        representation['venue'] = models.Venue.objects.get(pk=value2).name
+        return representation
 
 class UserScheduledTimetableSerializer(serializers.ModelSerializer):
     start_date_and_time = serializers.DateTimeField(format=None)
@@ -95,11 +116,11 @@ class UserScheduledTimetableSerializer(serializers.ModelSerializer):
 
 
         avail_ven = get_available_venues(start=start,end=end,date_day=date)
-        if str(venue.id) not in avail_ven:
-            raise serializers.ValidationError("Venue no longer available")
-        
+        try:
+            avail_ven.get(id__in=[venue.id,])
+        except models.Venue.DoesNotExist:
+            raise serializers.ValidationError("Venue is no longer available")
         return attrs
-
 
 class SchoolTimetableSerializer(serializers.ModelSerializer):
 
@@ -120,6 +141,15 @@ class SchoolTimetableSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Time must be within working hours")
 
         return data
+
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        course_id = representation['course']
+        venue_id = representation['venue']
+
+        representation['venue'] = models.Venue.objects.get(pk=venue_id).name
+        representation['course'] = models.Course.objects.get(pk=course_id).code
+        return representation
 
 class QueryParamsSerializer(BaseSerializer):
     start_date_and_time = serializers.DateTimeField(format=None)

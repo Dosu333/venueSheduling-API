@@ -8,8 +8,8 @@ app_name = 'accounts'
 
 router = routers.SimpleRouter()
 router.register('department', views.DepartmentViewSet)
-router.register('role', views.RoleViewSet)
-
+router.register('users', views.AdminManageUserViewSet)
+router.register('roles', views.GroupViewSet)
 urlpatterns = [
     path('create/', views.CreateUserView.as_view(), name='create'),
     path('me/', views.ManageUserView.as_view(), name='me'),

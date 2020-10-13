@@ -11,21 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Role',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=225, unique=True)),
-            ],
-        ),
         migrations.RemoveField(
             model_name='user',
             name='is_lecturer',
         ),
        
-        migrations.AddField(
-            model_name='user',
-            name='role',
-            field=models.ManyToManyField(blank=True, to='accounts.Role'),
-        ),
+       
     ]

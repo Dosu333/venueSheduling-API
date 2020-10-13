@@ -1,17 +1,22 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import Group, Permission
 
 from rest_framework import serializers
 
-from .models import Department, Role
+from .models import Department
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
-
     class Meta:
         model = get_user_model()
-        fields = ('email','password','first_name','last_name','department')
+        fields = ('email','first_name','last_name','department','password')
         extra_kwargs = {'password': {'write_only':True, 'min_length':8}}
+
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        representation['department'] = Department.objects.get(id=str(representation['department'])).name
+        return representation
 
     def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
@@ -34,12 +39,35 @@ class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = ('__all__')
-        read_only_fields = ['id',]
 
-class RoleSerializer(serializers.ModelSerializer):
-    """Serializes department model object"""
+class AdminManageUserSerializer(serializers.ModelSerializer):
+    """Serializes role field of user model"""
+    department = serializers.StringRelatedField()
+    class Meta:
+        model = get_user_model()
+        fields = ('groups','is_staff','id','email','first_name','last_name','department')
+        read_only_fields  = ['email','first_name','last_name','department']
+
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        str_group = []
+        for id in representation['groups']:
+            role = Group.objects.get(pk=id).name
+            str_group.append((id,role))
+        representation['groups'] = str_group
+        return representation
+
+class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Role
+        model = Group
         fields = ('__all__')
-        read_only_fields = ['id',]
+
+    def to_representation(self,instance):
+        representation = super().to_representation(instance)
+        str_perm = []
+        for id in representation['permissions']:
+            role = Permission.objects.get(pk=id).name
+            str_perm.append(role)
+        representation['permissions'] = str_perm
+        return representation

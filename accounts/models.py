@@ -32,13 +32,6 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-class Role(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=225, unique=True)
-
-    def __str__(self):
-        return self.name
-
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model that supports using email instead of username"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -48,7 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     department = models.ForeignKey(Department, on_delete = models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    role = models.ManyToManyField(Role, blank=True)
+    # roles = models.ManyToManyField(Group, blank=True, related_name='role')
 
     objects = UserManager()
 
