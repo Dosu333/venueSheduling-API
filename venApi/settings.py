@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
+    'django_crontab',
     'accounts',
     'Schedule'
 ]
@@ -166,3 +167,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'accounts.User'
+
+CRONJOBS = [
+    ('*/1 * * * *', 'Schedule.cron.clean_tables')
+]

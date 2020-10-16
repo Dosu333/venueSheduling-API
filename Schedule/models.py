@@ -82,6 +82,7 @@ class Venue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=150, unique=True)
     capacity = models.IntegerField(null=True)
+    is_conference_hall = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

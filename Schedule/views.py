@@ -70,7 +70,7 @@ class SchoolTimetableViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.SchoolTimetableSerializer
     permission_classes = [permissions.IsAdminUser|CustomDjangoModelPermission]
     filter_backends = [filters.SearchFilter,filters.OrderingFilter]
-    search_fields = ['course__code','course__department__name','day']
+    search_fields = ['course__code','course__department__name','venue__name']
     ordering_fields = ['day','start_time']
 
     def perform_create(self,serializer):

@@ -8,5 +8,6 @@ COPY . /code
 
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
+RUN apt-get -y install cron
 RUN useradd appuser && chown -R appuser /code
 USER appuser
