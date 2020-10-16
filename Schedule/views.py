@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from .import serializers
 from .import models
 from.permissions import CustomDjangoModelPermission
-from.venues_filter import get_available_venues
+from.venues_filter import get_available_venues, send_notifications
 # Create your views here.
 
 class BaseAdminViewSet(viewsets.ModelViewSet):
@@ -26,6 +26,7 @@ class BaseAdminViewSet(viewsets.ModelViewSet):
         obj = self.queryset.get(pk=instance.id)
         
         models.SummaryTimetable.objects.create(start_date=date, start_time=start, end_time=time, content_object=obj, venue=venue)
+        send_notifications(start=start,end=time,date_day=date,venue=venue)
 
     def perform_destroy(self,request):
         instance = self.get_object()
@@ -82,6 +83,7 @@ class SchoolTimetableViewSet(viewsets.ModelViewSet):
         obj = self.queryset.get(pk=instance.id)
 
         models.SummaryTimetable.objects.create(start_time=start_time, end_time=end_time, day=day, content_object=obj, venue=venue )
+        send_notifications(start=start_time,end=end_time,date_day=day,venue=venue)
     
     def perform_destroy(self,request):
         instance = self.get_object()
