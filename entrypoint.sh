@@ -1,4 +1,5 @@
-#!bin
+#!/bin/sh
+
 
 if ["$DATABASE"="postgres"]
 then
@@ -13,6 +14,20 @@ do
 
 fi
 
-python manage.py mkemigrations --no-input
+python manage.py makemigrations --no-input
 python manage.py migrate --no-input
 exec "$@"
+
+# echo "Waiting for postgres..."
+
+# while ! nc -z db 5432; do
+#   sleep 0.1
+# done
+
+# echo "PostgreSQL started"
+
+# python manage.py flush --no-input
+# python manage.py migrate
+# python manage.py collectstatic --no-input --clear
+
+# exec "$@"
