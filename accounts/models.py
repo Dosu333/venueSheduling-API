@@ -41,7 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     department = models.ForeignKey(Department, on_delete = models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    # roles = models.ManyToManyField(Group, blank=True, related_name='role')
 
     objects = UserManager()
 

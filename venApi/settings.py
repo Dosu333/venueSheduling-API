@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
-    'django_crontab',
     'accounts',
     'Schedule'
 ]
@@ -109,11 +108,6 @@ SIMPLE_JWT = {
 
 }
 
-# SWAGGER_SETTINGS = {
-#     "DEFAULT_GENERATOR_CLASS": "rest_framework.schemas.generators.BaseSchemaGenerator"
-# }
-
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -168,6 +162,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'accounts.User'
 
-CRONJOBS = [
-    ('*/1 * * * *', 'Schedule.cron.clean_tables')
-]
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER","redis://redis:6379/0")

@@ -3,26 +3,34 @@ version: "3.3"
 services:
   db:
     image: postgres
-    environment:
-      - POSTGRES_DB=code  
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file: 
+      ./.env
+    volumes: 
+      - pgdata:/var/lib/postgresql/data
   api:
     build: .
-    command: >
-      sh -c "python manage.py wait_for_db && 
-             python manage.py crontab add &&
-             python manage.py makemigrations &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/code
+      - .:/usr/src/app
     ports:
       - "8000:8000"
-    environment:
-      - DB_HOST=db
-      - DB_NAME=code
-      - DB_USER=postgres
-      - DB_PASS=postgres
+    env_file: 
+      ./.env
     depends_on:
       - db
+      - redis
+    command: python manage.py runserver 0.0.0.0:8000
+
+  celery:
+    build: .
+    command: celery -A venApi worker -l INFO
+    volumes: 
+      - .:/usr/src/app
+    env_file: 
+      ./.env
+    depends_on: 
+      - api
+      - redis
+  redis:
+    image: "redis:alpine"
+volumes: 
+  pgdata:

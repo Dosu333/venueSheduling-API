@@ -1,13 +1,9 @@
-FROM python:3.8
+FROM python:3.8-slim
 
 ENV PYTHONUNBUFFERED=1
 
-RUN mkdir /code 
-WORKDIR /code
-COPY . /code
-
-COPY requirements.txt /code/
+WORKDIR /usr/src/app
+COPY requirements.txt ./
 RUN pip install -r requirements.txt
-RUN apt-get -y install cron
-RUN useradd appuser && chown -R appuser /code
-USER appuser
+
+ENTRYPOINT [ "/entrypoint.sh" ]

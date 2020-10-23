@@ -1,12 +1,16 @@
-from Schedule.models import SummaryTimetable
-
-from datetime import datetime
+from celery import shared_task
+from demoapp.models import Widget
 
 from django.db.models import Q
 
+from datetime import datetime
+
+from.models import SummaryTimetable
+
+@shared_task
 def clean_tables():
     today = datetime.today().strftime('%Y-%m-%d')
-    now = datetime.utcnow().time()
+    now = datetime.now().time()
     qs = SummaryTimetable.objects.filter(start_date=today)
     clean = qs.filter(Q(end_time=now)|Q(end_time__lt=now))
 
