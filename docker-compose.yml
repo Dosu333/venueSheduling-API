@@ -32,5 +32,12 @@ services:
       - redis
   redis:
     image: "redis:alpine"
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 4030:8080
 volumes: 
   pgdata:

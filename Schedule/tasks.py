@@ -1,5 +1,4 @@
 from celery import shared_task
-from demoapp.models import Widget
 
 from django.db.models import Q
 

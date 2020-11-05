@@ -11,6 +11,8 @@ from pytz import UTC as utc
 def check_time_within_working_hours(start,end):
     return (start >= time(7,00) and start <= time(18,30)) and (end >= time(8,00) and end <= time(19,00))
 
+def get_obj_type():
+    return ContentType.objects.get(app_label='Schedule',model='examtimetable')
 
 class BaseSerializer(serializers.ModelSerializer):
 
@@ -63,7 +65,7 @@ class VenueSerializer(serializers.ModelSerializer):
 class ExamTimetableSerializer(BaseSerializer):
     start_date_and_time = serializers.DateTimeField(format=None)
     end_time = serializers.TimeField(format=None)
-    obj_type = ContentType.objects.get(app_label='Schedule',model='examtimetable')
+    obj_type = get_obj_type()
     msg = "Venue clashes with another exam on the timetable"
     all_venues = True
     class Meta:
@@ -78,6 +80,8 @@ class ExamTimetableSerializer(BaseSerializer):
         representation['venue'] = models.Venue.objects.get(pk=value2).name
         representation['course'] = models.Course.objects.get(pk=value1).code
         return representation
+
+   
 
 class EventSerializer(serializers.ModelSerializer):
 
