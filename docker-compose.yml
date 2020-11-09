@@ -30,6 +30,7 @@ services:
     depends_on: 
       - api
       - redis
+
   redis:
     image: "redis:alpine"
   adminer:
@@ -39,5 +40,30 @@ services:
       - db
     ports:
       - 4030:8080
+
+  celery-beat:
+    build: .
+    command: celery -A venApi beat -l INFO
+    volumes: 
+      - .:/usr/src/app
+    env_file: 
+      ./.env
+    depends_on: 
+      - api
+      - redis
+
+  dashboard:
+    build: .
+    command: flower -A venApi --port=5555 --broker=redis://redis:6379/0
+    ports: 
+      - 5555:5555
+    volumes: 
+      - .:/usr/src/app
+    env_file: 
+      ./.env
+    depends_on: 
+      - api
+      - redis
+      - celery
 volumes: 
   pgdata:

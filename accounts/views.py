@@ -56,3 +56,14 @@ class GroupViewSet(viewsets.ModelViewSet):
         users = get_user_model().objects.filter(groups__id=pk)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)  
+
+from Schedule.models import SummaryTimetable
+from django.db.models import Q
+from datetime import datetime
+today = datetime.today()
+now = datetime.now().time()
+qs = SummaryTimetable.objects.filter(Q(start_date__lt=today) | (Q(start_date=today) & Q(end_time__lte=now)) )
+# for items in qs:
+#    items.content_object.delete()
+#    items.delete()
+print(qs.query)
